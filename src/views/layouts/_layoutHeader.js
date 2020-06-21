@@ -100,8 +100,8 @@ export default class Header extends React.PureComponent {
           }
           {this.state.isAuthorization && 
       <NavDropdown title={this.state.login} variant="outline-secondary" id="collasible-nav-dropdown" style={{paddingRight:'80px'}}>
-        <NavDropdown.Item href="/Tests">Create themes</NavDropdown.Item>
-        <NavDropdown.Item href="/Themes">Create tests</NavDropdown.Item>
+        <NavDropdown.Item href="/Themes">Create themes</NavDropdown.Item>
+        <NavDropdown.Item href="/Tests">Create tests</NavDropdown.Item>
         <NavDropdown.Divider />
         <NavDropdown.Item href="/Home/Logout">Logout</NavDropdown.Item>
     </NavDropdown>}
