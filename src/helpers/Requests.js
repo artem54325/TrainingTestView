@@ -1,5 +1,4 @@
 import {URL} from './Contants';
-import axios from 'axios';
 
 export async function postData(url = '', data = {}) {
     // Default options are marked with *

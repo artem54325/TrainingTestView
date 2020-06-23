@@ -1,7 +1,7 @@
 import React from 'react';
-import logo from './../../logo.svg';
+// import logo from './../../logo.svg';
 import './../../css/layouts/_layoutHeader.css';
-import {Modal, Button, Form,Navbar,Nav,NavDropdown,FormControl} from 'react-bootstrap';
+import {Modal, Button, Form,Navbar,Nav,NavDropdown} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default class Header extends React.PureComponent {

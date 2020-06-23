@@ -1,8 +1,8 @@
 import React from 'react';
 import './../../App.css';
-import {Modal, Button, Form,Dropdown,DropdownButton,FormControl,InputGroup, ListGroup} from 'react-bootstrap';
+import {Button, Dropdown,DropdownButton,FormControl,InputGroup, ListGroup} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import styles from './index.css';
+// import styles from './index.css';
 import {getData} from '../../helpers/Requests';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -222,7 +222,7 @@ export default class CreateThemes extends React.Component {
         questions = this.state.themes[i].questions;
         nameThema = this.state.themes[i].name;
       }
-      themesView.push(<ListGroup.Item onClick={this.setIdThema.bind(this, this.state.themes[i].id)} key={i.toString()} on as="li" active={act}>{this.state.themes[i].name}</ListGroup.Item>);
+      themesView.push(<ListGroup.Item onClick={this.setIdThema.bind(this, this.state.themes[i].id)} key={i.toString()} as="li" active={act}>{this.state.themes[i].name}</ListGroup.Item>);
     }    
 
     if(questions!=null){

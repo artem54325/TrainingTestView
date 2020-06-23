@@ -1,13 +1,13 @@
 import React from 'react';
 import './../../App.css';
-import {Modal, Button, Form,Dropdown,DropdownButton,FormControl,InputGroup,Table, ListGroup} from 'react-bootstrap';
+import {Button,Dropdown,DropdownButton,FormControl,InputGroup,Table, ListGroup} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import styles from './index.css';
+// import styles from './index.css';
 import {getData} from './../../helpers/Requests';
 import { v4 as uuidv4 } from 'uuid';
 
 
-var types = ["Один правильный", "Несколько правильных"];
+// var types = ["Один правильный", "Несколько правильных"];
 export default class CreateTest extends React.Component {
 
   constructor(props){
@@ -190,7 +190,7 @@ export default class CreateTest extends React.Component {
           }
         }
         if(!status){
-          var thema = null;
+          var thema;
           for(var l = 0;l<this.state.themes.length;l++){
             if(this.state.themes[l].id === idThemaNow){
               thema = this.state.themes[l];
@@ -200,7 +200,7 @@ export default class CreateTest extends React.Component {
             countBalls: 0,
             countQuest: 0,
             id: uuidv4(),
-            thema: 0,
+            thema: thema,
             themaId: idThemaNow
           });
         }
@@ -242,7 +242,7 @@ export default class CreateTest extends React.Component {
     var descriptionTest = null;
     var timeAll = null;
     var passwords = null;
-    var dateUpdated = null;
+    // var dateUpdated = null;
 
     for(var i = 0; i < this.state.tests.length; i++){
       var act = false;
@@ -253,9 +253,9 @@ export default class CreateTest extends React.Component {
         themes = this.state.tests[i].themes;
         passwords = this.state.tests[i].passwords;
         timeAll = this.state.tests[i].timeAll;
-        dateUpdated = this.state.tests[i].dateLastChanges;
+        // dateUpdated = this.state.tests[i].dateLastChanges;
       }
-      testsView.push(<ListGroup.Item key={'test-' + i} onClick={this.setIdTest.bind(this, this.state.tests[i].id)} key={i.toString()} on as="li" active={act}>{this.state.tests[i].name}</ListGroup.Item>);
+      testsView.push(<ListGroup.Item key={'test-' + i} onClick={this.setIdTest.bind(this, this.state.tests[i].id)} on as="li" active={act}>{this.state.tests[i].name}</ListGroup.Item>);
     }
 
     if(passwords!==null){
