@@ -1,13 +1,12 @@
 import React from 'react';
 import './../../App.css';
-import {Modal, Button, Form,Dropdown,DropdownButton,FormControl,InputGroup,Table, ListGroup, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Button,FormControl, ListGroup, OverlayTrigger, Tooltip, Form, Table} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from './index.css';
-import {getData} from './../../helpers/Requests';
-import { v4 as uuidv4 } from 'uuid';
+import {getData, postData, postDataJson} from './../../helpers/Requests';
+// import { v4 as uuidv4 } from 'uuid';
 
 
-var types = ["Один правильный", "Несколько правильных"];
 export default class CreateTest extends React.Component {
 
   constructor(props){
@@ -15,20 +14,52 @@ export default class CreateTest extends React.Component {
     this.state={
       tests: [],
       questions: [],
+      questionsResult: [],
+      result: null,
+      selectQuest: 0,
       idTests: null,
       status: true,
       password: "",
+      startDate:null,
+      status: "select",// select, write, result
     };
+
     this.onChangePassword = this.onChangePassword.bind(this);
     this.checkingPassword = this.checkingPassword.bind(this);
+    this.selectTest = this.selectTest.bind(this);
+
+    this.onResult = this.onResult.bind(this);
+    this.selectAnser = this.selectAnser.bind(this);
+    this.onNext = this.onNext.bind(this);
+    this.onQuestion = this.onQuestion.bind(this);
+    this.onQuestionResult = this.onQuestionResult.bind(this);
+    this.onBack = this.onBack.bind(this);
   }
 
   componentDidMount(){// TestingTest/GetTests
-    getData("TestingTest/GetAllTest").then(body=>{
-      const json = JSON.parse(body);
-      console.log('all tests', json);
+    // getData("TestingTest/GetAllTest").then(body=>{
+    //   const json = JSON.parse(body);
+    //   console.log('all tests', json);
+    //   this.setState({
+    //     tests: json,
+    //     status: "select",
+    //   });
+    // });
+    postData("TestingTest/GetTest", { id: "test-1" }).then((body) => {
+      console.log('body ', body);
+      for(var i = 0; i < body.length; i++){
+        body[i].rightAnswers = [body[i].answers[0]];
+      }
       this.setState({
-        tests: json
+        questions: body,
+        status: "write",
+      });
+      postDataJson("TestingTest/Result", body).then((result) => {
+        this.setState({
+          result: body,
+          questionsResult: body.questionAnswers,
+          status: "result",
+        });
       });
     });
   }
@@ -46,41 +77,232 @@ export default class CreateTest extends React.Component {
 
   }
 
-  selectTest(id){
-    console.log('Select id =', id);
+  selectTest(event){
+    var id = event.target.attributes.getNamedItem('key-date').value;
+
+    postData("TestingTest/GetTest", { id: id }).then((body) => {
+      console.log('body ', body);
+      this.setState({
+        questions: body,
+        status: "write",
+      });
+    });
+  }
+  // Для написания вопросов
+  onBack(event){
+    console.log('selectBack');
+  }
+
+  onResult(event){
+    console.log('selectResult');
+    postData("TestingTest/Result", { id: 'id' }).then((body) => {
+      console.log('body ', body);
+      this.setState({
+        questions: body,
+        status: "write",
+      });
+    });
+  }
+
+  selectAnser(event){
+    console.log('selectAnser');
+
+  }
+
+  onNext(event){
+    console.log('onNext');
+
+  }
+
+  onBack(event){
+    console.log('onBack');
+
+  }
+
+  onQuestion(event){
+    console.log('onQuestion');
+    
+  }
+
+  // Для результат
+  onQuestionResult(event){
+    console.log('onQuestionResult');
+
   }
 
   render(){
     // Views
     var testsView = [];
-
-    for(var i=0; i < this.state.tests.length; i++){
-      console.log(this.state.tests[i]);
-      testsView.push(
-      <OverlayTrigger key={'test-' + i} overlay={<Tooltip id="tooltip-disabled">{this.state.tests[i].description}</Tooltip>}>
-          <span className="d-inline-block">
-          <ListGroup.Item style={{ pointerEvents: 'none', width: '100%' }} 
-              onClick={this.selectTest.bind(this, this.state.tests[i].id)} as="li">{this.state.tests[i].name} ({this.state.tests[i].questions.length})</ListGroup.Item>
-          </span>
-        </OverlayTrigger>
-      );
-    }
-
-    return (
-      <div style={{display: "flex", marginTop:'1%', paddingRight:'1%'}} >
-      <ListGroup as="ul" className="themes">
-        <h1 style={{width:'100%',textAlign:'center'}}>Tests</h1>
-        {testsView}
-      </ListGroup>
-      <div style={{width:'100%', height:'30%', position:'relative'}}>
-        <h1 style={{width:'100%',textAlign:'center', height:'50%',}}>Password</h1>
-        <div style={{display: 'flex', marginTop: '1%', paddingRight: '1%', position: 'absolute', left:'25%'}} >
-          <FormControl onChange={this.setNameTest} style={{width:'250px', }} onChange={this.onChangePassword}
-                aria-label="lg" aria-describedby="inputGroup-sizing-sm" placeholder={"Password"} value={this.state.password}/>
-          <Button variant="success" style={{marginBottom:'5px'}} onClick={this.checkingPassword}>Check passwords</Button>
+    var view = [];
+    if(this.state.status === "select"){
+      for(var i=0; i < this.state.tests.length; i++){
+        testsView.push(<ListGroup.Item key={'test-' + i} style={{ width: '100%' }}  onClick={this.selectTest} key-date={this.state.tests[i].id} 
+            on as="li" key-date={this.state.tests[i].id}>
+        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.state.tests[i].description}</Tooltip>}>
+            <span>{this.state.tests[i].name} ({this.state.tests[i].questions})</span>
+          </OverlayTrigger>
+          </ListGroup.Item>
+        );
+      }
+      view = (<div style={{display: "flex", marginTop:'1%', paddingRight:'1%'}} ><ListGroup as="ul" className="themes">
+      <h1 style={{width:'100%',textAlign:'center'}}>Tests</h1>
+      {testsView}
+    </ListGroup>
+    <div style={{width:'100%', height:'30%', position:'relative'}}>
+      <h1 style={{width:'100%',textAlign:'center', height:'50%',}}>Password</h1>
+      <div style={{display: 'flex', marginTop: '1%', paddingRight: '1%', position: 'absolute', left:'25%'}} >
+        <FormControl onChange={this.setNameTest} style={{width:'250px', }} onChange={this.onChangePassword}
+              aria-label="lg" aria-describedby="inputGroup-sizing-sm" placeholder={"Password"} value={this.state.password}/>
+        <Button variant="success" style={{marginBottom:'5px'}} onClick={this.checkingPassword}>Check passwords</Button>
+      </div> </div></div>);
+    } else if(this.state.status === "write"){
+      /*
+allAnswers: false
+answers: (5) ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4", "Ответ 5"]
+appraisal: 5
+countAnswers: 5
+description: "Текст ВОПРОСА 1"
+id: "quest1"
+name: "Question 1"
+rightAnswers: null
+thema: null
+themaId: "thema-1"
+typeAnswer: 2
+      */
+     var allQuestions = [];
+     var answersView = [];
+     for(var i=0;i<this.state.questions.length;i++){
+       // Если выбран хотя бы один ответ изменить цвет ответа
+       // Сделать таймер!
+       // Если таймер вышел, то выключать!
+        allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-id={this.state.questions[i].id} on onClick={this.onQuestion}
+          active={this.state.selectQuest==i}>{this.state.questions[i].name}</ListGroup.Item>);
+     }
+     for(var i=0;i<this.state.questions[this.state.selectQuest].answers.length;i++){
+       answersView.push(<Form.Check id={"answer-"+i.toString()} 
+          key-answer={this.state.questions[this.state.selectQuest].answers[i]} 
+          onClick={this.selectAnser}  style={{textAlign:'center'}} 
+          type="checkbox" label={this.state.questions[this.state.selectQuest].answers[i]} />);
+     }
+      view = (
+        <div style={{alignSelf:'center', display: "flex"}}>
+          {/* All question */}
+          <div style={{width:'30%'}}>
+          <ListGroup>
+            {allQuestions}
+            </ListGroup>
+          </div>
+          {/* this question */}
+          <div style={{width:'70%'}}>
+          <h2 style={{textAlign:'center'}}>
+            {this.state.questions[this.state.selectQuest].name}
+          </h2>
+          <h4 style={{textAlign:'center'}}>{this.state.questions[this.state.selectQuest].description}</h4>
+          {answersView}
+          <div style={{marginTop:'3%'}}>
+            <Button style={{width:'40%', marginRight:'7%', marginLeft:'7%'}} onClick={this.onBack} variant="primary">Back</Button>
+            <Button style={{width:'40%', }} onClick={this.onNext} variant="primary">Next</Button>
+          </div>
+          <Button style={{width:'87%', marginTop:'3%',marginRight:'7%', marginLeft:'7%'}} onClick={this.onResult} variant="primary">Result</Button>
         </div>
-      </div>
-      </div>
-    )
+        </div>
+      )
+    }else{// Результаты:
+      var allQuestions = [];
+      var answersView = [];
+      for(var i=0;i<this.state.questions.length;i++){
+        // Если выбран хотя бы один ответ изменить цвет ответа
+        // Сделать таймер!
+        // Если таймер вышел, то выключать!
+        /*
+appraisal: 0
+correctly: 4
+correctlyQuestions: 4
+dateFinish: "0001-01-01T00:00:00"
+dateStart: "0001-01-01T00:00:00"
+departament: null
+group: null
+id: "315a3ea3-d600-4669-9a0d-5bea0a72e358"
+ipAddress: "::1"
+mark: null
+markId: null
+mistakes: 0
+questionAnswers: [{id: "fab5f6be-f4bb-40e4-a7c6-28c71d4902a3", testStudentId: null, questionId: "quest1", time: 0,…},…]
+studentUser: null
+studentUserId: null
+test: null
+testId: null
+time: 0
+username: null
+
+      answers:
+answers: ["Ответ 1"]
+appraisal: 0
+dateAnswer: "0001-01-01T00:00:00"
+description: "Текст ВОПРОСА 1"
+error: 0
+id: "fab5f6be-f4bb-40e4-a7c6-28c71d4902a3"
+name: "Question 1"
+questionAnswers: ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4", "Ответ 5"]
+questionId: "quest1"
+questionRightAnswers: ["Ответ 1"]
+status: true
+successfully: 0
+testStudentId: null
+time: 0
+        */
+          allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-id={this.state.questions[i].id} on onClick={this.onQuestionResult}
+            active={this.state.selectQuest==i}>{this.state.questions[i].name}</ListGroup.Item>);
+      }
+      for(var i=0;i<this.state.questions[this.state.selectQuest].answers.length;i++){
+        answersView.push(<Form.Check key={"answer-"+i.toString()} 
+            key-answer={this.state.questions[this.state.selectQuest].answers[i]} 
+            onClick={this.selectAnser}  style={{textAlign:'center'}} 
+            type="checkbox" label={this.state.questions[this.state.selectQuest].answers[i]} />);
+      }
+      view = (
+        <div style={{alignSelf:'center', display: "flex"}}>
+          {/* All question */}
+          <div style={{width:'30%'}}>
+          <ListGroup>
+            {allQuestions}
+            </ListGroup>
+          </div>
+          {/* this question */}
+          <div style={{width:'70%'}}>
+          <h1 style={{textAlign:'center'}}>Result</h1>
+          <Table striped bordered hover size="sm">
+            <tbody>
+              <tr>
+                <td>Time</td>
+                <td>24:00</td>
+              </tr>
+              <tr>
+                <td>Balls</td>
+                <td>20</td>
+              </tr>
+              <tr>
+                <td>Percent</td>
+                <td>50</td>
+              </tr>
+              <tr>
+                <td>Correct answers (incorrect answers)</td>
+                <td>25 (5)</td>
+              </tr>
+            </tbody>
+          </Table>
+          <h2 style={{textAlign:'center'}}>
+            {this.state.questions[this.state.selectQuest].name}
+          </h2>
+          <h4 style={{textAlign:'center'}}>{this.state.questions[this.state.selectQuest].description}</h4>
+          {answersView}
+          <Button style={{width:'87%', marginTop:'3%',marginRight:'7%', marginLeft:'7%'}} onClick={this.onQuestionResult} variant="primary">Menu</Button>
+        </div>
+        </div>
+      )
+    }
+    
+
+    return view;
   }
 }
