@@ -18,7 +18,6 @@ export default class CreateTest extends React.Component {
       result: null,
       selectQuest: 0,
       idTests: null,
-      status: true,
       password: "",
       startDate:null,
       status: "select",// select, write, result
@@ -48,7 +47,7 @@ export default class CreateTest extends React.Component {
     postData("TestingTest/GetTest", { id: "test-1" }).then((body) => {
       console.log('body ', body);
       for(var i = 0; i < body.length; i++){
-        body[i].rightAnswers = [body[i].answers[0]];
+        body[i].rightAnswers = [];
       }
       this.setState({
         questions: body,
@@ -95,39 +94,68 @@ export default class CreateTest extends React.Component {
 
   onResult(event){
     console.log('selectResult');
-    postData("TestingTest/Result", { id: 'id' }).then((body) => {
-      console.log('body ', body);
+    postDataJson("TestingTest/Result", this.state.questions).then((result) => {
+      console.log('Result', result);
       this.setState({
-        questions: body,
-        status: "write",
+        result: result,
+        questionsResult: result.questionAnswers,
+        status: "result",
       });
     });
   }
 
   selectAnser(event){
-    console.log('selectAnser');
+    // key-number
+    // event.target.attributes.getNamedItem('key-number').value
+    const number = event.target.attributes.getNamedItem('key-number').value;
+    const answer = this.state.questions[this.state.selectQuest].answers[number];
+    var questions = this.state.questions;
 
+    console.log('selectAnser', number, this.state.questions[this.state.selectQuest].answers[number]);
+    console.log('answers', questions[this.state.selectQuest].rightAnswers, number, questions[this.state.selectQuest].rightAnswers.includes(answer));
+
+    if (questions[this.state.selectQuest].rightAnswers.includes(answer)) {
+      var numberAnswer = null;// answer
+      questions[this.state.selectQuest].rightAnswers.splice(questions[this.state.selectQuest].rightAnswers.indexOf(answer), 1);
+    }else{
+      questions[this.state.selectQuest].rightAnswers.push(answer);
+    }
+    
+    this.setState({
+      questions: questions
+    });
   }
 
   onNext(event){
-    console.log('onNext');
-
+    if (this.state.questions.length-1 > this.state.selectQuest) {
+      this.setState({
+        selectQuest: this.state.selectQuest + 1
+      });
+    }
   }
 
   onBack(event){
     console.log('onBack');
-
+    if (this.state.selectQuest >= 0) {
+      this.setState({
+        selectQuest: this.state.selectQuest - 1
+      });
+    }
   }
 
-  onQuestion(event){
+  onQuestion(event){// key-number
     console.log('onQuestion');
-    
+    this.setState({
+      selectQuest: event.target.attributes.getNamedItem('key-number').value
+    });
   }
 
   // Для результат
   onQuestionResult(event){
     console.log('onQuestionResult');
-
+    this.setState({
+      selectQuest: event.target.attributes.getNamedItem('key-number').value
+    });
   }
 
   render(){
@@ -175,14 +203,16 @@ typeAnswer: 2
        // Если выбран хотя бы один ответ изменить цвет ответа
        // Сделать таймер!
        // Если таймер вышел, то выключать!
-        allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-id={this.state.questions[i].id} on onClick={this.onQuestion}
+        allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-id={this.state.questions[i].id} key-number={i} on onClick={this.onQuestion}
           active={this.state.selectQuest==i}>{this.state.questions[i].name}</ListGroup.Item>);
      }
-     for(var i=0;i<this.state.questions[this.state.selectQuest].answers.length;i++){
-       answersView.push(<Form.Check id={"answer-"+i.toString()} 
-          key-answer={this.state.questions[this.state.selectQuest].answers[i]} 
-          onClick={this.selectAnser}  style={{textAlign:'center'}} 
-          type="checkbox" label={this.state.questions[this.state.selectQuest].answers[i]} />);
+     for(var i=0; i < this.state.questions[this.state.selectQuest].answers.length; i++){
+      var status = this.state.questions[this.state.selectQuest].rightAnswers.includes(this.state.questions[this.state.selectQuest].answers[i]);
+      // variant="success"
+      // variant="danger"
+      answersView.push(<ListGroup.Item key={i.toString()} style={{textAlign:'center'}} 
+        as="li" active={false} onClick={this.selectAnser} key-number={i}
+        active={status}>{this.state.questions[this.state.selectQuest].answers[i]}</ListGroup.Item>)
      }
       view = (
         <div style={{alignSelf:'center', display: "flex"}}>
@@ -190,7 +220,7 @@ typeAnswer: 2
           <div style={{width:'30%'}}>
           <ListGroup>
             {allQuestions}
-            </ListGroup>
+          </ListGroup>
           </div>
           {/* this question */}
           <div style={{width:'70%'}}>
@@ -210,11 +240,7 @@ typeAnswer: 2
     }else{// Результаты:
       var allQuestions = [];
       var answersView = [];
-      for(var i=0;i<this.state.questions.length;i++){
-        // Если выбран хотя бы один ответ изменить цвет ответа
-        // Сделать таймер!
-        // Если таймер вышел, то выключать!
-        /*
+       /*
 appraisal: 0
 correctly: 4
 correctlyQuestions: 4
@@ -251,14 +277,22 @@ successfully: 0
 testStudentId: null
 time: 0
         */
-          allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-id={this.state.questions[i].id} on onClick={this.onQuestionResult}
+      for(var i=0;i<this.state.questions.length;i++){
+        // Если выбран хотя бы один ответ изменить цвет ответа
+        // Сделать таймер!
+        // Если таймер вышел, то выключать!
+        allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-number={i} key-id={this.state.questions[i].id} on onClick={this.onQuestionResult}
             active={this.state.selectQuest==i}>{this.state.questions[i].name}</ListGroup.Item>);
       }
       for(var i=0;i<this.state.questions[this.state.selectQuest].answers.length;i++){
-        answersView.push(<Form.Check key={"answer-"+i.toString()} 
-            key-answer={this.state.questions[this.state.selectQuest].answers[i]} 
-            onClick={this.selectAnser}  style={{textAlign:'center'}} 
-            type="checkbox" label={this.state.questions[this.state.selectQuest].answers[i]} />);
+        // answersView.push(<Form.Check key={"answer-"+i.toString()} 
+        //     key-answer={this.state.questions[this.state.selectQuest].answers[i]} 
+        //     onClick={this.selectAnser} style={{textAlign:'center'}} 
+        //     type="checkbox" label={this.state.questions[this.state.selectQuest].answers[i]} />);
+        answersView.push((<ListGroup.Item key={i.toString()} style={{textAlign:'center'}} 
+        as="li" 
+        key-answer={this.state.questions[this.state.selectQuest].answers[i]}
+        active={status}>{this.state.questions[this.state.selectQuest].answers[i]}</ListGroup.Item>))
       }
       view = (
         <div style={{alignSelf:'center', display: "flex"}}>
