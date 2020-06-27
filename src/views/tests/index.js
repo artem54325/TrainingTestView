@@ -45,7 +45,7 @@ export default class CreateTest extends React.Component {
     //   });
     // });
     postData("TestingTest/GetTest", { id: "test-1" }).then((body) => {
-      console.log('body ', body);
+      console.log('get test ', body);
       for(var i = 0; i < body.length; i++){
         body[i].rightAnswers = [];
       }
@@ -53,10 +53,14 @@ export default class CreateTest extends React.Component {
         questions: body,
         status: "write",
       });
+      for(var i=0;i<body.length;i++){
+        body[i].rightAnswers.push("Ответ 1");
+      }
       postDataJson("TestingTest/Result", body).then((result) => {
+        console.log('get result', result)
         this.setState({
-          result: body,
-          questionsResult: body.questionAnswers,
+          result: result,
+          questionsResult: result.questionAnswers,
           status: "result",
         });
       });
@@ -184,19 +188,6 @@ export default class CreateTest extends React.Component {
         <Button variant="success" style={{marginBottom:'5px'}} onClick={this.checkingPassword}>Check passwords</Button>
       </div> </div></div>);
     } else if(this.state.status === "write"){
-      /*
-allAnswers: false
-answers: (5) ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4", "Ответ 5"]
-appraisal: 5
-countAnswers: 5
-description: "Текст ВОПРОСА 1"
-id: "quest1"
-name: "Question 1"
-rightAnswers: null
-thema: null
-themaId: "thema-1"
-typeAnswer: 2
-      */
      var allQuestions = [];
      var answersView = [];
      for(var i=0;i<this.state.questions.length;i++){
@@ -208,8 +199,6 @@ typeAnswer: 2
      }
      for(var i=0; i < this.state.questions[this.state.selectQuest].answers.length; i++){
       var status = this.state.questions[this.state.selectQuest].rightAnswers.includes(this.state.questions[this.state.selectQuest].answers[i]);
-      // variant="success"
-      // variant="danger"
       answersView.push(<ListGroup.Item key={i.toString()} style={{textAlign:'center'}} 
         as="li" active={false} onClick={this.selectAnser} key-number={i}
         active={status}>{this.state.questions[this.state.selectQuest].answers[i]}</ListGroup.Item>)
@@ -260,39 +249,37 @@ test: null
 testId: null
 time: 0
 username: null
-
-      answers:
-answers: ["Ответ 1"]
-appraisal: 0
-dateAnswer: "0001-01-01T00:00:00"
-description: "Текст ВОПРОСА 1"
-error: 0
-id: "fab5f6be-f4bb-40e4-a7c6-28c71d4902a3"
-name: "Question 1"
-questionAnswers: ["Ответ 1", "Ответ 2", "Ответ 3", "Ответ 4", "Ответ 5"]
-questionId: "quest1"
-questionRightAnswers: ["Ответ 1"]
-status: true
-successfully: 0
-testStudentId: null
-time: 0
         */
-      for(var i=0;i<this.state.questions.length;i++){
+      for(var i=0;i<this.state.questionsResult.length;i++){
         // Если выбран хотя бы один ответ изменить цвет ответа
         // Сделать таймер!
         // Если таймер вышел, то выключать!
-        allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-number={i} key-id={this.state.questions[i].id} on onClick={this.onQuestionResult}
-            active={this.state.selectQuest==i}>{this.state.questions[i].name}</ListGroup.Item>);
+        var status = "danger"
+        
+        if (this.state.questionsResult[i].status) {
+          status = "success";
+        }
+
+        allQuestions.push(<ListGroup.Item  key={'quest-' + i} key-number={i} key-id={this.state.questionsResult[i].id} on onClick={this.onQuestionResult}
+            variant={status} active={this.state.selectQuest==i}>{this.state.questionsResult[i].name}</ListGroup.Item>);
       }
-      for(var i=0;i<this.state.questions[this.state.selectQuest].answers.length;i++){
-        // answersView.push(<Form.Check key={"answer-"+i.toString()} 
-        //     key-answer={this.state.questions[this.state.selectQuest].answers[i]} 
-        //     onClick={this.selectAnser} style={{textAlign:'center'}} 
-        //     type="checkbox" label={this.state.questions[this.state.selectQuest].answers[i]} />);
-        answersView.push((<ListGroup.Item key={i.toString()} style={{textAlign:'center'}} 
-        as="li" 
-        key-answer={this.state.questions[this.state.selectQuest].answers[i]}
-        active={status}>{this.state.questions[this.state.selectQuest].answers[i]}</ListGroup.Item>))
+      for(var i=0;i<this.state.questionsResult[this.state.selectQuest].questionAnswers.length;i++){
+        var status = "light";
+
+        if (this.state.questionsResult[this.state.selectQuest].questionRightAnswers.includes(this.state.questionsResult[this.state.selectQuest].questionAnswers[i])) {
+          status = "primary";
+        }
+
+        if (this.state.questionsResult[this.state.selectQuest].answers.includes(this.state.questionsResult[this.state.selectQuest].questionAnswers[i])) {
+          status = "danger";
+          if (this.state.questionsResult[this.state.selectQuest].questionRightAnswers.includes(this.state.questionsResult[this.state.selectQuest].questionAnswers[i])) {
+            status = "success";
+          }
+        }
+        answersView.push((<ListGroup.Item key={i.toString()}  
+          as="li" style={{textAlign:'center'}}
+          key-answer={this.state.questionsResult[this.state.selectQuest].questionAnswers[i]}
+          variant={status}>{this.state.questionsResult[this.state.selectQuest].questionAnswers[i]}</ListGroup.Item>))
       }
       view = (
         <div style={{alignSelf:'center', display: "flex"}}>
@@ -313,15 +300,15 @@ time: 0
               </tr>
               <tr>
                 <td>Balls</td>
-                <td>20</td>
+                <td>{this.state.result.appraisal}</td>
               </tr>
               <tr>
                 <td>Percent</td>
-                <td>50</td>
+                <td>{this.state.result.correctlyQuestions * 100 / (this.state.result.correctlyQuestions + this.state.result.mistakes)} %</td>
               </tr>
               <tr>
                 <td>Correct answers (incorrect answers)</td>
-                <td>25 (5)</td>
+                <td>{this.state.result.correctlyQuestions} ({this.state.result.mistakes})</td>
               </tr>
             </tbody>
           </Table>
@@ -331,6 +318,13 @@ time: 0
           <h4 style={{textAlign:'center'}}>{this.state.questions[this.state.selectQuest].description}</h4>
           {answersView}
           <Button style={{width:'87%', marginTop:'3%',marginRight:'7%', marginLeft:'7%'}} onClick={this.onQuestionResult} variant="primary">Menu</Button>
+          <div>
+            <h2>Helpers</h2>
+            <h4>Green - Сorrect answer</h4>
+            <h4>Red - Error answer</h4>
+            {/* <h4>Gray - Right answer</h4> */}
+            <h4>Blue - Сorrect answer but not selected</h4>
+          </div>
         </div>
         </div>
       )
