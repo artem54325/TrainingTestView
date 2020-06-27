@@ -21,6 +21,7 @@ export default class CreateTest extends React.Component {
       password: "",
       startDate:null,
       status: "select",// select, write, result
+      dateTime: Date.now()
     };
 
     this.onChangePassword = this.onChangePassword.bind(this);
@@ -53,17 +54,17 @@ export default class CreateTest extends React.Component {
         questions: body,
         status: "write",
       });
-      for(var i=0;i<body.length;i++){
-        body[i].rightAnswers.push("Ответ 1");
-      }
-      postDataJson("TestingTest/Result", body).then((result) => {
-        console.log('get result', result)
-        this.setState({
-          result: result,
-          questionsResult: result.questionAnswers,
-          status: "result",
-        });
-      });
+      // for(var i=0;i<body.length;i++){
+      //   body[i].rightAnswers.push("Ответ 1");
+      // }
+      // postDataJson("TestingTest/Result", body).then((result) => {
+      //   console.log('get result', result)
+      //   this.setState({
+      //     result: result,
+      //     questionsResult: result.questionAnswers,
+      //     status: "result",
+      //   });
+      // });
     });
   }
 
@@ -91,6 +92,7 @@ export default class CreateTest extends React.Component {
       });
     });
   }
+
   // Для написания вопросов
   onBack(event){
     console.log('selectBack');
@@ -162,6 +164,15 @@ export default class CreateTest extends React.Component {
     });
   }
 
+  setTimeQuestion(){
+    var number = this.state.selectQuest;
+    var questions = this.state.questions;
+    var timeOld = this.state.dateTime;
+    var timeNow = Date.now();
+    console.log('time', questions[number].time);
+    
+  }
+
   render(){
     // Views
     var testsView = [];
@@ -203,6 +214,7 @@ export default class CreateTest extends React.Component {
         as="li" active={false} onClick={this.selectAnser} key-number={i}
         active={status}>{this.state.questions[this.state.selectQuest].answers[i]}</ListGroup.Item>)
      }
+     setTimeQuestion();
       view = (
         <div style={{alignSelf:'center', display: "flex"}}>
           {/* All question */}
@@ -229,27 +241,7 @@ export default class CreateTest extends React.Component {
     }else{// Результаты:
       var allQuestions = [];
       var answersView = [];
-       /*
-appraisal: 0
-correctly: 4
-correctlyQuestions: 4
-dateFinish: "0001-01-01T00:00:00"
-dateStart: "0001-01-01T00:00:00"
-departament: null
-group: null
-id: "315a3ea3-d600-4669-9a0d-5bea0a72e358"
-ipAddress: "::1"
-mark: null
-markId: null
-mistakes: 0
-questionAnswers: [{id: "fab5f6be-f4bb-40e4-a7c6-28c71d4902a3", testStudentId: null, questionId: "quest1", time: 0,…},…]
-studentUser: null
-studentUserId: null
-test: null
-testId: null
-time: 0
-username: null
-        */
+       // time
       for(var i=0;i<this.state.questionsResult.length;i++){
         // Если выбран хотя бы один ответ изменить цвет ответа
         // Сделать таймер!
@@ -296,7 +288,7 @@ username: null
             <tbody>
               <tr>
                 <td>Time</td>
-                <td>24:00</td>
+                <td>{this.state.result.time}</td>
               </tr>
               <tr>
                 <td>Balls</td>
