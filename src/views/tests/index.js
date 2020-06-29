@@ -19,9 +19,8 @@ export default class CreateTest extends React.Component {
       selectQuest: 0,
       idTests: null,
       password: "",
-      startDate:null,
+      startDate: null,
       status: "select",// select, write, result
-      dateTime: Date.now()
     };
 
     this.onChangePassword = this.onChangePassword.bind(this);
@@ -34,38 +33,11 @@ export default class CreateTest extends React.Component {
     this.onQuestion = this.onQuestion.bind(this);
     this.onQuestionResult = this.onQuestionResult.bind(this);
     this.onBack = this.onBack.bind(this);
+    this.onMenu = this.onMenu.bind(this);
   }
 
   componentDidMount(){// TestingTest/GetTests
-    // getData("TestingTest/GetAllTest").then(body=>{
-    //   const json = JSON.parse(body);
-    //   console.log('all tests', json);
-    //   this.setState({
-    //     tests: json,
-    //     status: "select",
-    //   });
-    // });
-    postData("TestingTest/GetTest", { id: "test-1" }).then((body) => {
-      console.log('get test ', body);
-      for(var i = 0; i < body.length; i++){
-        body[i].rightAnswers = [];
-      }
-      this.setState({
-        questions: body,
-        status: "write",
-      });
-      // for(var i=0;i<body.length;i++){
-      //   body[i].rightAnswers.push("Ответ 1");
-      // }
-      // postDataJson("TestingTest/Result", body).then((result) => {
-      //   console.log('get result', result)
-      //   this.setState({
-      //     result: result,
-      //     questionsResult: result.questionAnswers,
-      //     status: "result",
-      //   });
-      // });
-    });
+    this.onMenu();
   }
 
   onChangePassword(event){
@@ -75,30 +47,40 @@ export default class CreateTest extends React.Component {
   }
 
   checkingPassword(){
-
-  }
-  componentWillReceiveProps(){
-
+    postData("TestingTest/Password", { password: this.state.password }).then((body) => {
+      console.log('body ', body);
+      for(var i = 0; i < body.length; i++){
+        body[i].rightAnswers = [];
+        body[i].time = 0; 
+      }
+      this.setState({
+        questions: body,
+        status: "write",
+        dateTime: Date.now(),
+      });
+    });
   }
 
   selectTest(event){
     var id = event.target.attributes.getNamedItem('key-date').value;
-
+    
     postData("TestingTest/GetTest", { id: id }).then((body) => {
       console.log('body ', body);
+      for(var i = 0; i < body.length; i++){
+        body[i].rightAnswers = [];
+        body[i].time = 0; 
+      }
       this.setState({
         questions: body,
         status: "write",
+        dateTime: Date.now(),
       });
     });
   }
 
   // Для написания вопросов
-  onBack(event){
-    console.log('selectBack');
-  }
-
   onResult(event){
+    this.setTimeQuestion();
     console.log('selectResult');
     postDataJson("TestingTest/Result", this.state.questions).then((result) => {
       console.log('Result', result);
@@ -133,6 +115,7 @@ export default class CreateTest extends React.Component {
   }
 
   onNext(event){
+    this.setTimeQuestion();
     if (this.state.questions.length-1 > this.state.selectQuest) {
       this.setState({
         selectQuest: this.state.selectQuest + 1
@@ -141,6 +124,7 @@ export default class CreateTest extends React.Component {
   }
 
   onBack(event){
+    this.setTimeQuestion();
     console.log('onBack');
     if (this.state.selectQuest >= 0) {
       this.setState({
@@ -150,9 +134,21 @@ export default class CreateTest extends React.Component {
   }
 
   onQuestion(event){// key-number
+    this.setTimeQuestion();
     console.log('onQuestion');
     this.setState({
       selectQuest: event.target.attributes.getNamedItem('key-number').value
+    });
+  }
+
+  onMenu(event){
+    getData("TestingTest/GetAllTest").then(body=>{
+      const json = JSON.parse(body);
+      console.log('all tests', json);
+      this.setState({
+        tests: json,
+        status: "select",
+      });
     });
   }
 
@@ -169,8 +165,15 @@ export default class CreateTest extends React.Component {
     var questions = this.state.questions;
     var timeOld = this.state.dateTime;
     var timeNow = Date.now();
-    console.log('time', questions[number].time);
+    console.log('time questions ', questions[number], number, this.state.dateTime);
+    console.log('time start', questions[number].time);
     
+    questions[number].time = questions[number].time + (timeNow - this.state.dateTime);// dateTime: Date.now()
+    console.log('time finish', questions[number].time);
+    this.setState({
+      dateTime: timeNow,
+      questions: questions,
+    })
   }
 
   render(){
@@ -181,7 +184,7 @@ export default class CreateTest extends React.Component {
       for(var i=0; i < this.state.tests.length; i++){
         testsView.push(<ListGroup.Item key={'test-' + i} style={{ width: '100%' }}  onClick={this.selectTest} key-date={this.state.tests[i].id} 
             on as="li" key-date={this.state.tests[i].id}>
-        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.state.tests[i].description}</Tooltip>}>
+          <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.state.tests[i].description}</Tooltip>}>
             <span>{this.state.tests[i].name} ({this.state.tests[i].questions})</span>
           </OverlayTrigger>
           </ListGroup.Item>
@@ -209,14 +212,15 @@ export default class CreateTest extends React.Component {
           active={this.state.selectQuest==i}>{this.state.questions[i].name}</ListGroup.Item>);
      }
      for(var i=0; i < this.state.questions[this.state.selectQuest].answers.length; i++){
+       console.log('questions', this.state.questions[this.state.selectQuest].rightAnswers);
       var status = this.state.questions[this.state.selectQuest].rightAnswers.includes(this.state.questions[this.state.selectQuest].answers[i]);
       answersView.push(<ListGroup.Item key={i.toString()} style={{textAlign:'center'}} 
         as="li" active={false} onClick={this.selectAnser} key-number={i}
         active={status}>{this.state.questions[this.state.selectQuest].answers[i]}</ListGroup.Item>)
      }
-     setTimeQuestion();
+
       view = (
-        <div style={{alignSelf:'center', display: "flex"}}>
+        <div style={{alignSelf:'center', display: "flex"}}>x
           {/* All question */}
           <div style={{width:'30%'}}>
           <ListGroup>
@@ -288,7 +292,7 @@ export default class CreateTest extends React.Component {
             <tbody>
               <tr>
                 <td>Time</td>
-                <td>{this.state.result.time}</td>
+                <td>{new Date(this.state.result.time).getMinutes()}:{new Date(this.state.result.time).getSeconds()}</td>
               </tr>
               <tr>
                 <td>Balls</td>
@@ -309,12 +313,11 @@ export default class CreateTest extends React.Component {
           </h2>
           <h4 style={{textAlign:'center'}}>{this.state.questions[this.state.selectQuest].description}</h4>
           {answersView}
-          <Button style={{width:'87%', marginTop:'3%',marginRight:'7%', marginLeft:'7%'}} onClick={this.onQuestionResult} variant="primary">Menu</Button>
+          <Button style={{width:'87%', marginTop:'3%',marginRight:'7%', marginLeft:'7%'}} onClick={this.onMenu} variant="primary">Menu</Button>
           <div>
             <h2>Helpers</h2>
             <h4>Green - Сorrect answer</h4>
             <h4>Red - Error answer</h4>
-            {/* <h4>Gray - Right answer</h4> */}
             <h4>Blue - Сorrect answer but not selected</h4>
           </div>
         </div>
