@@ -11,7 +11,7 @@ import Menu from './views/menu/index';
 import Meeting from './views/meeting/index';
 import TestingTests from './views/tests/index';
 import Users from './views/users/index';
-import VideoCall from './views/articles/index';
+import VideoCall from './views/videoCalls/index';
 
 
 const NoMatchPage = () => {

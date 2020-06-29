@@ -1,24 +1,18 @@
 import React from 'react';
 import './../../App.css';
+import {Button,FormControl, ListGroup, OverlayTrigger, Tooltip, Form, Table} from 'react-bootstrap';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{height:'100vh', width:'100vw', display:'flex', position:'relative'}}>
+      <div style={{height:'100vh', width:'70vw', background:'black'}}>
+        qweewq
+      </div>
+      <div style={{height:'100vh', width:'30vw', background:'white'}}>
+      </div>
+      <Button style={{position:'absolute', marginTop: '20px' ,marginLeft:'10px'}} variant="primary">Save Link</Button>
     </div>
-  );
+    );
 }
 
 export default App;
