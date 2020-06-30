@@ -183,7 +183,7 @@ export default class CreateTest extends React.Component {
     if(this.state.status === "select"){
       for(var i=0; i < this.state.tests.length; i++){
         testsView.push(<ListGroup.Item key={'test-' + i} style={{ width: '100%' }}  onClick={this.selectTest} key-date={this.state.tests[i].id} 
-            on as="li" key-date={this.state.tests[i].id}>
+            on as="li">
           <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">{this.state.tests[i].description}</Tooltip>}>
             <span>{this.state.tests[i].name} ({this.state.tests[i].questions})</span>
           </OverlayTrigger>

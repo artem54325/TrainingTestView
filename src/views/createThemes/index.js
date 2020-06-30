@@ -3,7 +3,7 @@ import './../../App.css';
 import {Button, Dropdown,DropdownButton,FormControl,InputGroup, ListGroup} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import styles from './index.css';
-import {getData} from '../../helpers/Requests';
+import {getData, postDataJson} from '../../helpers/Requests';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -32,6 +32,8 @@ export default class CreateThemes extends React.Component {
     this.setChecked = this.setChecked.bind(this);
     this.saveAllThemes = this.saveAllThemes.bind(this);
     this.setOnChangeType = this.setOnChangeType.bind(this);
+    this.setIdThema = this.setIdThema.bind(this);
+    this.setIdQuestion = this.setIdQuestion.bind(this);
   }
 
   componentDidMount(){
@@ -44,11 +46,13 @@ export default class CreateThemes extends React.Component {
     });
   }
 
-  setIdThema(id){
+  setIdThema(event){
+    var id = event.target.attributes.getNamedItem('key-id').value;
     this.setState({ idThema: id });
   }
 
-  setIdQuestion(id){
+  setIdQuestion(event){
+    var id = event.target.attributes.getNamedItem('key-id').value;
     this.setState({ idQuestion: id });
   }
 
@@ -144,7 +148,13 @@ export default class CreateThemes extends React.Component {
   }
 
   saveAllThemes(){
-
+    postDataJson("CreateTest/SaveAllThemes", this.state.themes).then((themes) => {
+      const json = JSON.parse(themes);
+      console.log('themes', json);
+      this.setState({
+        themes: json
+      });
+    });
   }
 
   setChecked(event){
@@ -222,7 +232,7 @@ export default class CreateThemes extends React.Component {
         questions = this.state.themes[i].questions;
         nameThema = this.state.themes[i].name;
       }
-      themesView.push(<ListGroup.Item onClick={this.setIdThema.bind(this, this.state.themes[i].id)} key={i.toString()} as="li" active={act}>{this.state.themes[i].name}</ListGroup.Item>);
+      themesView.push(<ListGroup.Item onClick={this.setIdThema} key-id={this.state.themes[i].id} key={i.toString()} as="li" active={act}>{this.state.themes[i].name}</ListGroup.Item>);
     }    
 
     if(questions!=null){
@@ -240,7 +250,7 @@ export default class CreateThemes extends React.Component {
           rights = questions[i].rightAnswers;
         }
 
-        questionsView.push(<ListGroup.Item onClick={this.setIdQuestion.bind(this, questions[i].id)} key={i.toString()} as="li" active={act}>{questions[i].name}</ListGroup.Item>);
+        questionsView.push(<ListGroup.Item onClick={this.setIdQuestion} key-id={questions[i].id} key={i.toString()} as="li" active={act}>{questions[i].name}</ListGroup.Item>);
       }
 
      if(answers !== null){
@@ -259,7 +269,7 @@ export default class CreateThemes extends React.Component {
             <InputGroup.Checkbox key-date={i} key-value={text} onClick={this.setChecked} name="answers" checked={activity}/>
             <InputGroup.Text id="inputGroup-sizing-sm">Answer - {i+1}</InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl key={i.toString()} key-date={i.toString()} onChange={this.setNameAnswer} aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={text}/>
+          <FormControl key={i.toString()} onChange={this.setNameAnswer} aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={text}/>
         </InputGroup>);
       }
      }
@@ -315,7 +325,7 @@ export default class CreateThemes extends React.Component {
       <div>
       {answersView}
       </div>
-      <Button variant="success" style={{marginBottom:'5px'}} onClick={this.createThema}>Save all themes</Button>
+      <Button variant="success" style={{marginBottom:'5px'}} onClick={this.saveAllThemes}>Save all themes</Button>
       </div>
       
       </div>

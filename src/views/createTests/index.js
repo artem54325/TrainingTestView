@@ -48,7 +48,7 @@ export default class CreateTest extends React.Component {
       const json = JSON.parse(body);
       console.log('all themes', json);
       this.setState({
-        themes:json
+        themes: json
       });
     });
   }
@@ -243,52 +243,56 @@ export default class CreateTest extends React.Component {
     var timeAll = null;
     var passwords = null;
     // var dateUpdated = null;
-
-    for(var i = 0; i < this.state.tests.length; i++){
-      var act = false;
-      if(this.state.tests[i].id === this.state.idTests){
-        act = true;
-        nameTest = this.state.tests[i].name;
-        descriptionTest = this.state.tests[i].description;
-        themes = this.state.tests[i].themes;
-        passwords = this.state.tests[i].passwords;
-        timeAll = this.state.tests[i].timeAll;
-        // dateUpdated = this.state.tests[i].dateLastChanges;
+    if (this.state.tests !== undefined) {
+      for(var i = 0; i < this.state.tests.length; i++){
+        var act = false;
+        if(this.state.tests[i].id === this.state.idTests){
+          act = true;
+          nameTest = this.state.tests[i].name;
+          descriptionTest = this.state.tests[i].description;
+          themes = this.state.tests[i].themes;
+          passwords = this.state.tests[i].passwords;
+          timeAll = this.state.tests[i].timeAll;
+          // dateUpdated = this.state.tests[i].dateLastChanges;
+        }
+        testsView.push(<ListGroup.Item key={'test-' + i} onClick={this.setIdTest.bind(this, this.state.tests[i].id)} on as="li" active={act}>{this.state.tests[i].name}</ListGroup.Item>);
       }
-      testsView.push(<ListGroup.Item key={'test-' + i} onClick={this.setIdTest.bind(this, this.state.tests[i].id)} on as="li" active={act}>{this.state.tests[i].name}</ListGroup.Item>);
-    }
-
-    if(passwords!==null){
-      for(var i=0;i<passwords.length;i++){
-        passwordsView.push(<InputGroup.Text  key={'password-' + i} id="inputGroup-sizing-sm">{passwords[i]}</InputGroup.Text>);
-      }
-    }
-
-    for(var i = 0; i < this.state.themes.length; i++){
-      var status = false;
-      var countBalls = 0;
-      var countQuestions = 0;
-      var themesId = this.state.themes[i].id;
-      if(themes!==null){
-        for(var a = 0; a < themes.length;a++){
-          if(themes[a].themaId === this.state.themes[i].id){
-            countQuestions = themes[a].countQuest;
-            countBalls = themes[a].countBalls;
-            status = true;
-            console.log('test', themes[a]);
-          }
+  
+      if(passwords!==null){
+        for(var i=0;i<passwords.length;i++){
+          passwordsView.push(<InputGroup.Text  key={'password-' + i} id="inputGroup-sizing-sm">{passwords[i]}</InputGroup.Text>);
         }
       }
-      themesView.push((<tr key={"table-"+i}>
-        <td>{i+1}</td>
-        <td><input key-date={themesId} type="checkbox" defaultChecked={status} onClick={this.setIdActivity}/></td>
-        <td><input key-date={themesId} type="number" name="countQuestions" value={countQuestions} disabled={!status} onChange={this.setIdCountQuestions}/></td>
-        <td><span>{this.state.themes[i].questions.length}</span></td>
-        <td><input key-date={themesId} type="number" name="count balls" value={countBalls} disabled={!status} onChange={this.setIdCountBalls}/></td>
-        <td><p title={this.state.themes[i].description}>{this.state.themes[i].name}</p></td>
-      </tr>));
     }
-    
+
+    if (this.state.themes !== undefined) {
+      for(var i = 0; i < this.state.themes.length; i++){
+        var status = false;
+        var countBalls = 0;
+        var countQuestions = 0;
+        var themesId = this.state.themes[i].id;
+        if(themes!==null){
+          for(var a = 0; a < themes.length;a++){
+            if(themes[a].themaId === this.state.themes[i].id){
+              countQuestions = themes[a].countQuest;
+              countBalls = themes[a].countBalls;
+              status = true;
+              console.log('test', themes[a]);
+            }
+          }
+        }
+        
+        themesView.push((<tr key={"table-"+i}>
+          <td>{i+1}</td>
+          <td><input key-date={themesId} type="checkbox" defaultChecked={status} onClick={this.setIdActivity}/></td>
+          <td><input key-date={themesId} type="number" name="countQuestions" value={countQuestions} disabled={!status} onChange={this.setIdCountQuestions}/></td>
+          <td><span>{this.state.themes[i].questions.length}</span></td>
+          <td><input key-date={themesId} type="number" name="count balls" value={countBalls} disabled={!status} onChange={this.setIdCountBalls}/></td>
+          <td><p title={this.state.themes[i].description}>{this.state.themes[i].name}</p></td>
+        </tr>));
+      }
+    }
+
     return (
       <div style={{display: "flex", marginTop:'1%', paddingRight:'1%'}}>
       <ListGroup as="ul" className="themes">
