@@ -1,19 +1,22 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM node:lts-slim
 WORKDIR /app
-EXPOSE 80 443 22 5000 5001
+EXPOSE 22 3000
 
 # FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 # WORKDIR /src
 # COPY TrainingTests/TrainingTests.csproj TrainingTests/
 # RUN dotnet restore "TrainingTests/TrainingTests.csproj"
-COPY . .
+# COPY . .
 # WORKDIR "/src/TrainingTests"
 # RUN dotnet build "TrainingTests.csproj" -c Release -o /app/build
 
 # FROM build AS publish
 # RUN dotnet publish "TrainingTests.csproj" -c Release -o /app/publish
+
+# docker build -t <name> .
+# docker run -p 221:22 -p 3001:300 -i -t <id>
 
 # apt-get
 RUN apt-get update
@@ -23,13 +26,32 @@ RUN apt-get install -y git
 RUN apt-get install -y curl
 RUN apt-get install -y supervisor
 
-RUN mkdir /root/.ssh && \
-    chmod 700 /root/.ssh && \
-    ssh-keygen -A
+# RUN mkdir /root/.ssh && \
+#     chmod 700 /root/.ssh && \
+#     ssh-keygen -A
 
-RUN useradd -m -d /app -s /bin/bash -g sudo ubuntu
-RUN echo 'ubuntu:qwe' | chpasswd
+# RUN useradd -m -d /app -s /bin/bash -g sudo ubuntu
+# RUN echo 'ubuntu:qwe' | chpasswd
 RUN echo 'root:root' | chpasswd
+RUN sed -i 's/.*#PermitRootLogin prohibit-password.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+# docker build -t <name> .
+# docker run -p 221:22 -p 3003:3000 -i -t <name>
+
+# https://www.dmosk.ru/miniinstruktions.php?mini=ubuntu-ssh-root
+# 1. /etc/ssh/sshd_config
+# 2. PermitRootLogin yes
+# 3. service ssh restart
+
+RUN git clone https://github.com/artem54325/TrainingTestView.git
+WORKDIR /app/TrainingTestView/
+RUN npm install
+
+RUN git config --global user.name "artem54325"
+RUN git config --global user.email "chilo997@mail.ru"
+
+ENTRYPOINT service ssh start && bash
+
+
 
 # ENTRYPOINT service ssh start # Все ломает
 # CMD dotnet watch run --urls http://0.0.0.0:5000
