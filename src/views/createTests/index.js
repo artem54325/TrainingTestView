@@ -115,10 +115,10 @@ export default class CreateTest extends React.Component {
     tests.push({
       description: "",
       id: uuidv4(),
-      marks:[],
+      marks:null,
       name: "New thema " + tests.length,
       passwords: [],
-      testType: [],
+      testType: 0,
       timeAll: 0,
     });
     this.setState({tests: tests});

@@ -102,8 +102,9 @@ export default class CreateThemes extends React.Component {
       if(this.state.themes[i].id === this.state.idThema){
         var themes = this.state.themes;
         for(var a =0;a<themes[i].questions.length;a++){
+          console.log('id question',themes[i].questions[a].id, this.state.idQuestion);
           if(this.state.idQuestion === themes[i].questions[a].id){
-            themes[i].questions[i].name = event.target.value;
+            themes[i].questions[a].name = event.target.value;
           }
         }
         this.setState({themes: themes});
@@ -158,17 +159,21 @@ export default class CreateThemes extends React.Component {
 
   setChecked(event){
     console.log('checked');
+    console.log('event', event.target.attributes.getNamedItem('key-val').value);
+    var value = event.target.attributes.getNamedItem('key-val').value;
     for(var i=0;i<this.state.themes.length; i++){
       if(this.state.themes[i].id === this.state.idThema){
         var themes = this.state.themes;
         for(var a =0;a<themes[i].questions.length;a++){
           if(this.state.idQuestion === themes[i].questions[a].id){
-            if(themes[i].questions[a].rightAnswers.includes(event.target.value)){
-              themes[i].questions[a].rightAnswers.splice(themes[i].questions[a].rightAnswers.indexOf(event.target.value), 1);
-            }else{
-              themes[i].questions[a].rightAnswers.push(event.target.value);
+            if (themes[i].questions[a].rightAnswers==null) {
+              themes[i].questions[a].rightAnswers = [];
             }
-            console.log('event', event.target.attributes.getNamedItem('key-date').value, event.target.attributes);
+            if(themes[i].questions[a].rightAnswers.includes(value)){
+              themes[i].questions[a].rightAnswers.splice(themes[i].questions[a].rightAnswers.indexOf(value), 1);
+            }else{
+              themes[i].questions[a].rightAnswers.push(value);
+            }
           }
         }
         this.setState({themes: themes});
@@ -256,19 +261,25 @@ export default class CreateThemes extends React.Component {
       for(var i = 0; i < answers.length || i < answerCountQuestion; i++){
         var activity = false;
         var text = null;
+        console.log('includes', rights);
+        if (rights==undefined) {
+          rights=[] 
+        }
         if(i < answers.length){
           text = answers[i];
           if(rights.includes(answers[i])){
             activity = true;
           }
         }
-
+        if (text==null) {
+          text="";
+        }
         answersView.push(<InputGroup size="sm" className="mb-3" key={i.toString()}>
           <InputGroup.Prepend>
-            <InputGroup.Checkbox key-date={i} key-value={text} onClick={this.setChecked} name="answers" checked={activity}/>
+            <InputGroup.Checkbox key-date={i} key-val={text} onClick={this.setChecked} name="answers" checked={activity}/>
             <InputGroup.Text id="inputGroup-sizing-sm">Answer - {i+1}</InputGroup.Text>
           </InputGroup.Prepend>
-          <FormControl key={i.toString()} onChange={this.setNameAnswer} aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={text}/>
+          <FormControl key={i.toString()} key-date={i} onChange={this.setNameAnswer} aria-label="Small" aria-describedby="inputGroup-sizing-sm" value={text}/>
         </InputGroup>);
       }
      }
