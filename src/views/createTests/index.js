@@ -3,7 +3,7 @@ import './../../App.css';
 import {Button,Dropdown,DropdownButton,FormControl,InputGroup,Table, ListGroup} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 // import styles from './index.css';
-import {getData} from './../../helpers/Requests';
+import { getData, postDataJson } from './../../helpers/Requests';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -125,13 +125,19 @@ export default class CreateTest extends React.Component {
   }
 
   saveAll(){
-
+    postDataJson("CreateTest/SaveAllTests", this.state.tests).then((tests) => {
+      console.log('themes', tests);
+      this.setState({
+        tests: tests
+      });
+    });
   }
 
   createPassword(){
     if(this.state.idTests === null){
       return null;
     }
+
     for(var i=0;i<this.state.tests.length; i++){
       if(this.state.tests[i].id === this.state.idTests){
         var tests = this.state.tests;
@@ -271,7 +277,8 @@ export default class CreateTest extends React.Component {
         var countBalls = 0;
         var countQuestions = 0;
         var themesId = this.state.themes[i].id;
-        if(themes!==null){
+        console.log('thema id', themes, this.state.idTests);
+        if(themes !== null && themes !== undefined){
           for(var a = 0; a < themes.length;a++){
             if(themes[a].themaId === this.state.themes[i].id){
               countQuestions = themes[a].countQuest;

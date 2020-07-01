@@ -71,7 +71,7 @@ export default class CreateThemes extends React.Component {
     themes.push({
       name: "Themes",
       questions: [],
-      id: uuidv4()
+      id: uuidv4(),
     });
     this.setState({ themes: themes });
   }
@@ -149,10 +149,9 @@ export default class CreateThemes extends React.Component {
 
   saveAllThemes(){
     postDataJson("CreateTest/SaveAllThemes", this.state.themes).then((themes) => {
-      const json = JSON.parse(themes);
-      console.log('themes', json);
+      console.log('themes', themes);
       this.setState({
-        themes: json
+        themes: themes
       });
     });
   }
