@@ -278,20 +278,25 @@ export default class CreateTest extends React.Component {
         var countQuestions = 0;
         var themesId = this.state.themes[i].id;
         console.log('thema id', themes, this.state.idTests);
+
         if(themes !== null && themes !== undefined){
+          console.log('themes count', themes.length, themes);
+          status = false;
           for(var a = 0; a < themes.length;a++){
             if(themes[a].themaId === this.state.themes[i].id){
               countQuestions = themes[a].countQuest;
               countBalls = themes[a].countBalls;
               status = true;
-              console.log('test', themes[a]);
+              break;
             }
           }
         }
+        console.log('i ',i,' status', status);
         
         themesView.push((<tr key={"table-"+i}>
           <td>{i+1}</td>
-          <td><input key-date={themesId} type="checkbox" defaultChecked={status} onClick={this.setIdActivity}/></td>
+          <InputGroup.Checkbox key-date={themesId} defaultChecked={status} aria-label="Checkbox for following text input" onClick={this.setIdActivity}/>
+          {/* <td><input key-date={themesId} type="checkbox" defaultChecked={status} onClick={this.setIdActivity}/></td> */}
           <td><input key-date={themesId} type="number" name="countQuestions" value={countQuestions} disabled={!status} onChange={this.setIdCountQuestions}/></td>
           <td><span>{this.state.themes[i].questions.length}</span></td>
           <td><input key-date={themesId} type="number" name="count balls" value={countBalls} disabled={!status} onChange={this.setIdCountBalls}/></td>
@@ -340,7 +345,7 @@ export default class CreateTest extends React.Component {
               <tr>
                 <th>#</th>
                 <th style={{width:'16%'}}>Activity thema</th>
-                <th style={{width:'16%'}}>Number of questions</th>
+                <th style={{width:'10%'}}>Number of questions</th>
                 <th style={{width:'16%'}}>Number of quest all</th>
                 <th style={{width:'16%'}}>Number of balls</th>
                 <th style={{width:'34%'}}>Name of thema</th>
