@@ -295,7 +295,7 @@ export default class CreateTest extends React.Component {
         
         themesView.push((<tr key={"table-"+i}>
           <td>{i+1}</td>
-          <InputGroup.Checkbox key-date={themesId} defaultChecked={status} aria-label="Checkbox for following text input" onClick={this.setIdActivity}/>
+          <InputGroup.Checkbox key-date={themesId} checked={status} aria-label="Checkbox for following text input" onClick={this.setIdActivity}/>
           {/* <td><input key-date={themesId} type="checkbox" defaultChecked={status} onClick={this.setIdActivity}/></td> */}
           <td><input key-date={themesId} type="number" name="countQuestions" value={countQuestions} disabled={!status} onChange={this.setIdCountQuestions}/></td>
           <td><span>{this.state.themes[i].questions.length}</span></td>
