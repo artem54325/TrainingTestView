@@ -2,7 +2,6 @@ import React from 'react';
 import './../../App.css';
 import {Button,Dropdown,DropdownButton,FormControl,InputGroup,Table, ListGroup} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import styles from './index.css';
 import { getData, postDataJson } from './../../helpers/Requests';
 import { v4 as uuidv4 } from 'uuid';
 
