@@ -49,7 +49,7 @@ viewer: 0
       console.log(element.id);
       
       articlesView.push(
-      <Card key={"article-"+index} style={{ width: '40rem',margin:'0 auto' }} onClick={this.setPage} key-data={element.id} >
+      <Card key={"article-"+index} style={{ width: '40rem',margin:'0 auto' }} onClick={this.setPage} key-data='element.id' >
         <Card.Img variant="top" src={element.image} />
         <Card.Body>
           <Card.Title>{element.title}</Card.Title>
