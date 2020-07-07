@@ -3,6 +3,7 @@ import './../../App.css';
 import {Button,Dropdown,DropdownButton,FormControl,InputGroup,Table, ListGroup, Card} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { getData, postDataJson } from './../../helpers/Requests';
+import FlatList from 'flatlist-react';
 
 export default class Article extends React.Component {
   constructor(props){
@@ -11,6 +12,7 @@ export default class Article extends React.Component {
       articles: [],
     };
     this.setPage = this.setPage.bind(this);
+    this.renderArticles = this.renderArticles.bind(this);
   }
   componentDidMount(){
     /*
@@ -42,28 +44,33 @@ viewer: 0
 
   }
 
+  renderArticles(article, idx){
+   return(
+    <Card key={"article-"+idx} style={{ width: '40rem',margin:'0 auto', marginTop: '15px' }} onClick={()=>{window.location.assign('/Article='+article.id);}} key-data={article.id} >
+    <Card.Img variant="top" src={article.image} />
+    <Card.Body>
+      <Card.Title>{article.title}</Card.Title>
+      <Card.Text>
+        {article.text.substr(0, 50)}
+      </Card.Text>
+    </Card.Body>
+  </Card>
+   )
+  }
+
   render(){
-    var articlesView =[];
-    for (var index = 0; index < this.state.articles.length; index++) {
-      const element = this.state.articles[index];
-      console.log(element.id);
-      
-      articlesView.push(
-      <Card key={"article-"+index} style={{ width: '40rem',margin:'0 auto' }} onClick={this.setPage} key-data='element.id' >
-        <Card.Img variant="top" src={element.image} />
-        <Card.Body>
-          <Card.Title>{element.title}</Card.Title>
-          <Card.Text>
-            {element.text.substr(0, 50)}
-          </Card.Text>
-        </Card.Body>
-      </Card>
-      );
-    }
     return (
       <>
       <div style={{width:'100%', alignSelf:'cemter'}}>
-        {articlesView}
+      <FlatList
+          list={this.state.articles}
+          renderItem={this.renderArticles}
+          renderWhenEmpty={() => <div>List is empty!</div>}
+          numColumns={2}
+          keyExtractor={item => item.id}
+          // sortBy={["firstName", {key: "lastName", descending: true}]}
+          // groupBy={person => person.info.age > 18 ? 'Over 18' : 'Under 18'}
+        />
       </div>
       </>
     )

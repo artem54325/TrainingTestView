@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
 import Header from './views/layouts/_layoutHeader';
 import Articles from './views/articles/index';
+import Article from './views/articles/article';
 import CreateTests from './views/createTests/index';
 import createThemes from './views/createThemes/index';
 import Menu from './views/menu/index';
@@ -28,6 +29,7 @@ ReactDOM.render(
             <Switch>
                 <Route path="/" component={Menu} exact={true}/>
                 <Route path="/Articles" component={Articles}/>
+                <Route path="/Article=:id" component={Article}/>
                 <Route path="/Tests" component={CreateTests}/>
                 <Route path="/Themes" component={createThemes}/>
                 <Route path="/Meeting" component={Meeting}/>
