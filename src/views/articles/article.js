@@ -12,6 +12,7 @@ export default class Article extends React.Component {
       article: [],
       comments: [],
       commentText: "",
+      idArticle: this.props.match.params.id,
     };
     this.error = null;
   }
@@ -27,28 +28,28 @@ export default class Article extends React.Component {
     userCreateId: "qw"
     viewer: 0
     */
-   var id = this.props.match.params.id;
-   console.log('article '+ id);
    
-    getData("Articles/Get?id=" + id).then(body=>{
+    getData("Articles/Get?id=" + this.state.idArticle).then(body=>{
       const json = JSON.parse(body);
-      if (json.length === 0) {
+      if (json === null) {
         // Errors 
         this.error = null;
       }
+      console.log(json);
+      
       this.setState({
-        article: json[0]
+        article: json
       });
     });
   }
 
-  setPage(event){
-    const id = event.target.attributes.getNamedItem('key-data');// .value
-    console.log('set page',id);
-    
-  }
   addComments(){
+    postDataJson("",{}).then(body=>{
 
+    }).catch(error=>{
+      console.log('Add comment', error);
+      
+    })
   }
   renderComments(comment, idx){
 
